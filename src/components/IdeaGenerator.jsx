@@ -14,31 +14,79 @@ export default function IdeaGenerator({ settings, notify, onUseIdea }) {
   const canRun = topic.trim() && channels.length && !loading;
 
   const run = async (e) => {
-    e.preventDefault(); if (!canRun) return;
+    e.preventDefault();
+    if (!canRun) return;
     setLoading(true);
-    const r = await generateIdeas({ topic: topic.trim(), platforms: channels, audience: audience.trim() }, settings);
-    setResult(r); setLoading(false);
+    const r = await generateIdeas(
+      { topic: topic.trim(), platforms: channels, audience: audience.trim() },
+      settings,
+    );
+    setResult(r);
+    setLoading(false);
     if (r.source === 'standalone') notify('Operating in standalone mode', 'info');
   };
-  const copy = async (i) => { try { await navigator.clipboard.writeText(i.hook); notify('Hook copied', 'success'); } catch { notify('Copy is blocked by the browser', 'error'); } };
-  const grouped = result ? channels.map((c) => [c, result.ideas.filter((i) => i.platform === c)]).filter(([, l]) => l.length) : [];
+  const copy = async (i) => {
+    try {
+      await navigator.clipboard.writeText(i.hook);
+      notify('Hook copied', 'success');
+    } catch {
+      notify('Copy is blocked by the browser', 'error');
+    }
+  };
+  const grouped = result
+    ? channels.map((c) => [c, result.ideas.filter((i) => i.platform === c)]).filter(([, l]) => l.length)
+    : [];
 
   return (
     <div className="grid gap-5 lg:grid-cols-[340px_1fr]">
       <form onSubmit={run} className="card h-fit space-y-4 p-5">
-        <div><label className="label" htmlFor="topic">Topic or keywords</label>
-          <input id="topic" className="input" placeholder="e.g. account-based marketing" value={topic} onChange={(e) => setTopic(e.target.value)} /></div>
-        <div><label className="label" htmlFor="aud">Audience</label>
-          <input id="aud" className="input" value={audience} onChange={(e) => setAudience(e.target.value)} /></div>
-        <fieldset><legend className="label">Channels</legend>
+        <div>
+          <label className="label" htmlFor="topic">
+            Topic or keywords
+          </label>
+          <input
+            id="topic"
+            className="input"
+            placeholder="e.g. account-based marketing"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="label" htmlFor="aud">
+            Audience
+          </label>
+          <input id="aud" className="input" value={audience} onChange={(e) => setAudience(e.target.value)} />
+        </div>
+        <fieldset>
+          <legend className="label">Channels</legend>
           <div className="flex flex-wrap gap-2">
             {IDEA_CHANNELS.map((c) => (
-              <button type="button" key={c} aria-pressed={channels.includes(c)} onClick={() => toggle(c)}
-                className={`rounded-full border px-3 py-1 text-sm transition-colors ${channels.includes(c) ? 'border-indigo-500 bg-indigo-600 text-white' : 'border-slate-300 text-slate-600 dark:border-white/15 dark:text-slate-300'}`}>{c === 'Twitter' ? 'Twitter/X' : c}</button>
+              <button
+                type="button"
+                key={c}
+                aria-pressed={channels.includes(c)}
+                onClick={() => toggle(c)}
+                className={`rounded-full border px-3 py-1 text-sm transition-colors ${channels.includes(c) ? 'border-indigo-500 bg-indigo-600 text-white' : 'border-slate-300 text-slate-600 dark:border-white/15 dark:text-slate-300'}`}
+              >
+                {c === 'Twitter' ? 'Twitter/X' : c}
+              </button>
             ))}
           </div>
         </fieldset>
-        <button className="btn-primary w-full" disabled={!canRun}>{loading ? <><Loader2 size={16} className="animate-spin" />Generating…</> : <><Sparkles size={16} />Generate ideas</>}</button>
+        <button className="btn-primary w-full" disabled={!canRun}>
+          {loading ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Generating…
+            </>
+          ) : (
+            <>
+              <Sparkles size={16} />
+              Generate ideas
+            </>
+          )}
+        </button>
         {!channels.length && <p className="text-xs text-rose-500">Pick at least one channel.</p>}
       </form>
 
@@ -47,26 +95,47 @@ export default function IdeaGenerator({ settings, notify, onUseIdea }) {
           <div className="card grid place-items-center p-12 text-center">
             <Sparkles className="mb-2 text-indigo-500" />
             <p className="font-medium">Turn a topic into five angles per channel</p>
-            <p className="mt-1 max-w-sm text-sm text-slate-500">Enter a topic and pick channels. Each idea comes with a hook and an outline you can send straight to the editor.</p>
+            <p className="mt-1 max-w-sm text-sm text-slate-500">
+              Enter a topic and pick channels. Each idea comes with a hook and an outline you can send
+              straight to the editor.
+            </p>
           </div>
         )}
         {result && (
           <p className={`text-xs ${result.source === 'n8n' ? 'text-emerald-600' : 'text-slate-500'}`}>
-            {result.source === 'n8n' ? 'Generated by your n8n workflow.' : `Standalone mode: sample ideas generated in your browser${result.error ? ` (${result.error})` : ''}.`}
+            {result.source === 'n8n'
+              ? 'Generated by your n8n workflow.'
+              : `Standalone mode: sample ideas generated in your browser${result.error ? ` (${result.error})` : ''}.`}
           </p>
         )}
         {grouped.map(([c, list]) => (
           <section key={c}>
-            <h3 className="mb-2 flex items-center gap-2 font-semibold"><PlatformBadge platform={c} /></h3>
+            <h3 className="mb-2 flex items-center gap-2 font-semibold">
+              <PlatformBadge platform={c} />
+            </h3>
             <div className="grid gap-3 md:grid-cols-2">
               {list.map((i) => (
                 <article key={i.id} className="card flex flex-col p-4">
-                  <span className="mb-1 text-xs font-medium text-indigo-600 dark:text-indigo-300">{i.angle}</span>
+                  <span className="mb-1 text-xs font-medium text-indigo-600 dark:text-indigo-300">
+                    {i.angle}
+                  </span>
                   <p className="font-medium leading-snug">{i.hook}</p>
-                  {!!i.outline.length && <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm text-slate-600 dark:text-slate-400">{i.outline.map((o) => <li key={o}>{o}</li>)}</ul>}
+                  {!!i.outline.length && (
+                    <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm text-slate-600 dark:text-slate-400">
+                      {i.outline.map((o) => (
+                        <li key={o}>{o}</li>
+                      ))}
+                    </ul>
+                  )}
                   <div className="mt-3 flex gap-2 pt-1">
-                    <button className="btn-primary !px-2.5 !py-1.5" onClick={() => onUseIdea(i)}><PenLine size={14} />Draft this</button>
-                    <button className="btn-outline !px-2.5 !py-1.5" onClick={() => copy(i)}><Copy size={14} />Copy hook</button>
+                    <button className="btn-primary !px-2.5 !py-1.5" onClick={() => onUseIdea(i)}>
+                      <PenLine size={14} />
+                      Draft this
+                    </button>
+                    <button className="btn-outline !px-2.5 !py-1.5" onClick={() => copy(i)}>
+                      <Copy size={14} />
+                      Copy hook
+                    </button>
                   </div>
                 </article>
               ))}

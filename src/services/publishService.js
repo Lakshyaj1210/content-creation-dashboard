@@ -5,10 +5,15 @@ export async function notifyPublish(post, settings, opts = {}) {
   const url = settings?.POST_PUBLISH_WEBHOOK_URL?.trim();
   if (!url || !isValidUrl(url)) return { source: 'standalone' };
   try {
-    await postJson(url, {
-      event: post.status === 'Published' ? 'post.published' : 'post.scheduled',
-      sentAt: new Date().toISOString(), ...post,
-    }, opts);
+    await postJson(
+      url,
+      {
+        event: post.status === 'Published' ? 'post.published' : 'post.scheduled',
+        sentAt: new Date().toISOString(),
+        ...post,
+      },
+      opts,
+    );
     return { source: 'n8n' };
   } catch (e) {
     return { source: 'standalone', error: e.message };

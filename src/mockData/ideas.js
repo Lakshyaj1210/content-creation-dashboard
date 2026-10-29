@@ -2,22 +2,39 @@ const ANGLES = [
   {
     angle: 'Contrarian take',
     hook: (t, a) => `Everything ${a} has been told about ${t} is slightly wrong.`,
-    outline: (t) => [`State the popular belief about ${t}`, 'Show the data or story that breaks it', 'Offer the replacement mental model'],
+    outline: (t) => [
+      `State the popular belief about ${t}`,
+      'Show the data or story that breaks it',
+      'Offer the replacement mental model',
+    ],
   },
   {
     angle: 'Step-by-step playbook',
     hook: (t) => `How we approach ${t} in 5 steps (and the step most teams skip).`,
-    outline: (t) => [`Why ${t} breaks down at scale`, 'The five steps, each with one concrete example', 'A checklist readers can copy'],
+    outline: (t) => [
+      `Why ${t} breaks down at scale`,
+      'The five steps, each with one concrete example',
+      'A checklist readers can copy',
+    ],
   },
   {
     angle: 'Personal story',
     hook: (t) => `We got ${t} badly wrong for two years. Here is what finally worked.`,
-    outline: () => ['The mistake, told honestly', 'The turning point', 'What changed in the numbers', 'What you would do first'],
+    outline: () => [
+      'The mistake, told honestly',
+      'The turning point',
+      'What changed in the numbers',
+      'What you would do first',
+    ],
   },
   {
     angle: 'Data-driven insight',
     hook: (t, a) => `We analysed 200 ${a} teams. The ${t} pattern nobody talks about.`,
-    outline: (t) => ['The headline number', `Three segments where ${t} behaves differently`, 'What to benchmark against'],
+    outline: (t) => [
+      'The headline number',
+      `Three segments where ${t} behaves differently`,
+      'What to benchmark against',
+    ],
   },
   {
     angle: 'Myth vs. reality',
@@ -39,7 +56,10 @@ export function generateMockIdeas({ topic, platform, audience = 'B2B marketers' 
     if (SHORT[platform] && hook.length > 120) hook = hook.slice(0, 117).trimEnd() + '…';
     return {
       id: `mock_${platform}_${i}_${t.length}`,
-      angle: x.angle, hook, outline: x.outline(t), platform,
+      angle: x.angle,
+      hook,
+      outline: x.outline(t),
+      platform,
     };
   });
 }

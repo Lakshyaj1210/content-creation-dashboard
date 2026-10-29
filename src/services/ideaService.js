@@ -4,15 +4,19 @@ import { uid } from './storage.js';
 
 /** Accepts [{...}], ["hook"], {ideas:[...]} or {data:[...]} from n8n. */
 export function normalizeIdeas(raw, platform) {
-  const list = Array.isArray(raw) ? raw : raw?.ideas ?? raw?.data ?? [];
+  const list = Array.isArray(raw) ? raw : (raw?.ideas ?? raw?.data ?? []);
   return list
-    .map((it, i) => typeof it === 'string'
-      ? { id: uid(), angle: `Angle ${i + 1}`, hook: it, outline: [], platform }
-      : {
-          id: it.id ?? uid(), angle: it.angle ?? `Angle ${i + 1}`,
-          hook: it.hook ?? it.title ?? it.idea ?? '',
-          outline: Array.isArray(it.outline) ? it.outline : [], platform: it.platform ?? platform,
-        })
+    .map((it, i) =>
+      typeof it === 'string'
+        ? { id: uid(), angle: `Angle ${i + 1}`, hook: it, outline: [], platform }
+        : {
+            id: it.id ?? uid(),
+            angle: it.angle ?? `Angle ${i + 1}`,
+            hook: it.hook ?? it.title ?? it.idea ?? '',
+            outline: Array.isArray(it.outline) ? it.outline : [],
+            platform: it.platform ?? platform,
+          },
+    )
     .filter((i) => i.hook);
 }
 
@@ -28,7 +32,8 @@ export async function generateIdeas({ topic, platforms, audience }, settings, op
   try {
     const results = await Promise.all(
       platforms.map(async (platform) =>
-        normalizeIdeas(await postJson(url, { topic, platform, audience }, opts), platform)),
+        normalizeIdeas(await postJson(url, { topic, platform, audience }, opts), platform),
+      ),
     );
     const ideas = results.flat();
     if (!ideas.length) throw new WebhookError('Webhook returned no ideas');

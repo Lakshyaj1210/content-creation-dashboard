@@ -3,10 +3,13 @@ node_modules/
 
 # Build output
 dist/
+coverage/
 
 # Environment files (NEVER commit secrets)
+.env
 .env.local
 .env.*.local
+!.env.example
 
 # OS / editor artifacts
 .DS_Store
@@ -21,3 +24,14 @@ npm-debug.log*
 # Vite / Vitest cache
 .vite/
 .vitest/
+
+# Reports and generated PDFs (not source code)
+reports/
+*.pdf
+*.report.*
+report.html
+report.json
+
+# Local scratch files
+*.tmp
+.tmp-*
